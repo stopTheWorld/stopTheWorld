@@ -1,6 +1,6 @@
 ################################# Url settings #################################
-baseurl: /stoptheworld
-#baseurl: ""
+#baseurl: /stoptheworld
+baseurl: ""
 url: https://stoptheworld.github.io
 
 
@@ -31,8 +31,8 @@ gems: [jekyll-paginate]
 exclude: ['README.md', 'Gemfile.lock', 'Gemfile', 'Rakefile']
 highlighter: rouge
 markdown: kramdown
-FB:
-  comments :
-    provider : disqus
-    disqus :
-        short_name : zhengjinglong
+#FB:
+#  comments :
+#    provider : disqus
+#    disqus :
+#        short_name : zhengjinglong
