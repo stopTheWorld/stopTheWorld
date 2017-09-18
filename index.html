@@ -97,13 +97,13 @@ title: TIMI PAGE
 
                 <!-- 分页链接 -->
                 <ul class="pagination">
-                    <li><a href="{{ '/' | append: site.baseurl }}/"><span>首页</span></a></li>
+                    <li><a href="{{ site.baseurl }}/"><span>首页</span></a></li>
                     <li>
                     {% if paginator.page == 1 %}
                         <span>&laquo;</span>
                     {% else %}
                         {% if paginator.previous_page == 1 %}
-                        <a href="/">
+                        <a href="{{ site.baseurl }}/">
                         {% else %}
                         <a href="{{ site.baseurl }}/page{{ paginator.previous_page }}">
                         {% endif %}
@@ -170,7 +170,7 @@ title: TIMI PAGE
                     {% elsif count == '1' %}
                         <a href="{{ site.baseurl }}/">{{ count }}</a>
                     {% else %}
-                        <a href="{{ site.baseurl }}/page{{ count }}/">{{ count }}</a>
+                        <a href="{{ site.baseurl }}/page{{ count }}">{{ count }}</a>
                     {% endif %}
                     {% endfor %}
                     </li>

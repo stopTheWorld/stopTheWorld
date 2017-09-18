@@ -11,7 +11,7 @@ motto: 我们笑着说再见，却深知再见遥遥无期。
 banner: 我想带你去看绚丽的山峦，去看秀丽的溪谷，这份心情，人类是如何称呼的呢。
 
 # Paginate settings
-paginate: 3
+paginate: 2
 paginate_path: "page:num"
 
 # Contact
