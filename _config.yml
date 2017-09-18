@@ -1,6 +1,6 @@
 ################################# Url settings #################################
-#baseurl: /stoptheworld
-baseurl: ""
+baseurl: /stoptheworld
+#baseurl: ""
 url: https://stoptheworld.github.io
 
 
