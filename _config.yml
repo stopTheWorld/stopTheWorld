@@ -1,7 +1,7 @@
 ################################# Url settings #################################
 baseurl: /stoptheworld
 #baseurl: ""
-url: https://stoptheworld.github.io
+#url: https://stoptheworld.github.io
 
 
 ################################# Site settings #################################
@@ -21,8 +21,6 @@ permalink: /:year/:month/:day/:title/
 
 ################################# Contact #################################
 author: ZJL
-email: zjl721@126.com
-github_username: stoptheworld
 github: https://github.com/stoptheworld/
 
 
@@ -31,6 +29,7 @@ gems: [jekyll-paginate]
 exclude: ['README.md', 'Gemfile.lock', 'Gemfile', 'Rakefile']
 highlighter: rouge
 markdown: kramdown
+
 #FB:
 #  comments :
 #    provider : disqus
