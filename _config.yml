@@ -1,5 +1,6 @@
 # Url settings
-baseurl: ""
+#baseurl: ""
+baseurl: /stoptheworld
 url: https://stoptheworld.github.io/stoptheworld/
 resume_site: https://github.com/stoptheworld/me/
 
