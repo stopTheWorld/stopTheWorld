@@ -8,6 +8,13 @@ permalink: /reference/
 <style>
 abbr {text-decoration: none;}
 </style>
+
+<hr><h4 class="btn btn-primary btn-lg">技能图谱</h4><hr>
+<ol class="rounded-list">
+<li><a href="http://www.jianshu.com/p/c8382065bd2b/" target="_blank">技能图谱</a></li>
+</ol>
+
+
 <hr><h4 class="btn btn-info btn-lg">JavaScript相关</h4><hr>
 <ol class="rectangle-list">
 <li><a href="http://react-china.org/" target="_blank">React China</a></li>
@@ -20,6 +27,8 @@ abbr {text-decoration: none;}
 <li><a href="http://www.typescriptlang.org/index.html" target="_blank">TypeScript</a></li>
 <li><a href="https://babeljs.io/" target="_blank">Babel</a></li>
 </ol>
+
+
 <hr><h4 class="btn btn-primary btn-lg">Node相关</h4><hr>
 <ol class="rounded-list">
 <li><a href="https://nodeschool.io/" target="_blank">NODESCHOOL</a></li>
@@ -28,6 +37,8 @@ abbr {text-decoration: none;}
 <li><a href="https://pugjs.org/api/getting-started.html" target="_blank">Pug</a></li>
 <li><a href="https://git-scm.com/docs" target="_blank">Git Reference</a></li>
 </ol>
+
+
 <hr><h4 class="btn btn-info btn-lg">CDN</h4><hr>
 <ol class="rectangle-list">
 <!--国外-->
@@ -37,6 +48,8 @@ abbr {text-decoration: none;}
 <li><a href="http://www.bootcdn.cn/" target="_blank">BootCDN</a></li>
 <li><a href="http://cdn.code.baidu.com/" target="_blank">百度静态资源公共库</a></li>
 </ol>
+
+
 <hr><h4 class="btn btn-primary btn-lg">CSS/HTML相关</h4><hr>
 <ol class="rounded-list">
 <!--CSS/HTML API-->
@@ -53,6 +66,8 @@ abbr {text-decoration: none;}
 <li><a href="https://daneden.github.io/animate.css/" target="_blank">Animate.css</a></li>
 <li><a href="http://cssicon.space/#/" target="_blank">CSS ICON</a></li>
 </ol>
+
+
 <hr><h4 class="btn btn-info btn-lg">资源网站</h4><hr>
 <ol class="rectangle-list">
 <li><a href="https://github.com/jobbole/awesome-javascript-cn" target="_blank">awesome-javascript-cn</a></li>
@@ -67,21 +82,8 @@ abbr {text-decoration: none;}
 <li><a href="https://placeholder.com/" target="_blank"><abbr title="提供占位符图片的网站">PLACEHOLDER.COM</abbr></a></li>
 <li><a href="https://dummyimage.com/" target="_blank"><abbr title="提供多类型占位符图片的网站">Dummy Image Generator</abbr></a></li>
 </ol>
-<hr><h4 class="btn btn-primary btn-lg">博客</h4><hr>
-<ol class="rounded-list">
-<li><a href="http://xiaokedada.com/" target="_blank">小可嗒嗒的博客</a></li>
-<li><a href="http://ghmagical.com/" target="_blank">TG的博客</a></li>
-</ol>
-<hr><h4 class="btn btn-info btn-lg">各大公司的前端站点</h4><hr>
-<ol class="rectangle-list">
-<li><a href="http://fex.baidu.com/" target="_blank">百度 FEX</a></li>
-<li><a href="http://taobaofed.org/" target="_blank">淘宝 FED</a></li>
-<li><a href="http://cdc.tencent.com/" target="_blank">腾讯 CDC</a></li>
-<li><a href="http://ued.ctrip.com/blog/" target="_blank">携程 UED</a></li>
-<li><a href="https://isux.tencent.com/" target="_blank">腾讯 ISUX</a></li>
-<li><a href="http://tgideas.qq.com/" target="_blank">腾讯T GIdeas</a></li>
-<li><a href="https://jdc.jd.com/" target="_blank">京东设计中心 JDC</a></li>
-</ol>
+
+
 <hr><h4 class="btn btn-primary btn-lg">综合站点</h4><hr>
 <ol class="rounded-list">
 <li><a href="https://restlet.com/http-status-map/" target="_blank">HTTP Status Map</a></li>
@@ -91,8 +93,9 @@ abbr {text-decoration: none;}
 <li><a href="http://en.cppreference.com/w/" target="_blank">C++ 参考手册</a></li>
 <li><a href="https://developers.google.com/web/tools/chrome-devtools/" target="_blank">Chrome DevTools</a></li>
 <li><a href="http://code.flickr.net/" target="_blank">Flickr 技术博客</a></li>
-
 </ol>
+
+
 <hr><h4 class="btn btn-info btn-lg">算法网站</h4><hr>
 <ol class="rectangle-list">
 <li><a href="https://www.codewars.com/" target="_blank">Code Kata</a></li>
