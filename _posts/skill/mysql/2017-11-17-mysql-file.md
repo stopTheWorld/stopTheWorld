@@ -1,0 +1,300 @@
+---
+layout: post
+title: "《MySQL技术内幕》- 学习笔记3 - 文件"
+date: 2017-11-17 15:00:00 +0800
+categories: mysql
+tag: [mysql,innodb]
+---
+* content
+{:toc}
+
+《MySQL技术内幕》学习笔记3 - 文件，方便回忆。
+
+---
+
+<!-- more -->
+<!-- TOC -->
+
+- [1. 参数文件](#1-参数文件)
+- [2. 日志文件](#2-日志文件)
+    - [2.1 错误日志（error log）](#21-错误日志error-log)
+    - [2.2 慢查询日志（slow query log）](#22-慢查询日志slow-query-log)
+    - [2.3 查询日志（log）](#23-查询日志log)
+    - [2.4 二进制日志（binlog）](#24-二进制日志binlog)
+- [3. 套接字文件](#3-套接字文件)
+- [4. pid文件](#4-pid文件)
+- [5. 表结构定义文件](#5-表结构定义文件)
+- [6. InnoDB存储引擎文件](#6-innodb存储引擎文件)
+    - [6.1 表空间文件](#61-表空间文件)
+    - [6.2 重做日志文件](#62-重做日志文件)
+
+<!-- /TOC -->
+
+---
+
+1. MySQL数据库文件：
+- 参数文件
+- 日志文件：错误日志、慢查询日志、查询日志、二进制日志
+- 套接字文件
+- pid文件
+- 表结构定义文件
+
+2. 各存储引擎相关的文件：
+- InnoDB存储引擎文件
+
+---
+
+#### 1. 参数文件
+
+* 告诉MySQL实例启动时在哪里可以找到数据库的各种文件，并且指定某些初始化参数
+
+
+* MySQL根据`配置参数文件`来启动实例
+
+    * 读取顺序为`/etc/my.cnf` -> `/etc/mysql/my.cnf` -> `/usr/local/mysql/etc/my.cnf` -> `/.my.cnf`
+    * 同一参数以最后读到的为准
+    * 若无配置文件，则使用编译代码的默认值
+
+* 参数类型
+
+  * `动态参数`（dynamic）：可以在MySQL实例运行中进行更改。可以通过`SET`命令对动态参数值进行修改
+  * `静态参数`（static）：在整个实例生命周期内都不得进行更改
+
+* 设置参数
+
+    ```mysql
+    SET 
+    | [global | session] system_var_name=expr
+    | [@@global. | @@session.|@@]system_var_name=expr
+    ```
+    ```mysql
+    SET read_buffer_size=524288; #将当前会话的参数read_buffer_size调整为512KB
+    SET @@global.read_buffer_size=1048576; #将read_buffer_size全局值更改为1MB(当前会话的还是512KB；并且只在这次的实例生命周期内有效；下次启动时MySQL实例还是会拿读取参数文件)
+    ```
+
+* 查看参数
+
+    * `SELECT`命令
+
+    ```mysql
+    SELECT @@global.read_buffer_size\G;
+    ```
+
+    * 可以通过命令`SHOW VARIABLES`查看数据库中的所有参数，也可以通过`LIKE`来过滤参数名
+
+    ```mysql
+    SHOW VARIABLES LIKE 'innodb_buffer%'\G;
+    ```
+
+    * 还可以通过`information_schema`架构下的`GLOBAL_VARIABLES`视图来进行查找
+
+    ```mysql
+    SELECT * FROM GLOBAL_VARIABLES WHERE VARIABLE_NAME LIKE 'innodb_buffer%'\G;
+    ```
+
+------
+
+#### 2 日志文件
+
+用来记录MySQL实例对某种条件作出响应时写入的文件，如错误日志、二进制文件、慢查询日志文件、查询日志文件
+
+---
+
+##### 2.1 错误日志（error log）
+
+* 对MySQL的启动、运行、关闭过程进行了记录。默认名是：`主机名.err`
+
+* 可以通过参数`log_error`来定位文件
+
+    ```mysql
+    SHOW VARIABLES LIKE 'log_error'\G;
+    ```
+
+---
+
+##### 2.2 慢查询日志（slow query log）
+
+* 可以在MySQL启动时设一个阈值，将运行时间超过该值的所有SQL语句都记录到慢查询日志文件中
+
+* `mysqldumpslow`可用于分析slow log
+
+    ```mysql
+    mysqldumpslow /opt/tmp/mysql.slow
+    ```
+
+* 慢查询表在`mysql`架构下，名为`slow_log`
+
+    ```mysql
+    SHOW CREATE TABLE mysql.slow_log\G;
+    ```
+
+* 相关参数 
+
+    * `slow_query_type`：启用slow log的方式
+        * 0：不将SQL语句记录到slow log
+        * 1：根据运行时间
+        * 2：根据逻辑IO次数
+        * 3：根据运行时间及逻辑IO次数
+    * `long_query_time`：运行时间阈值，默认10秒
+    * `long_query_io`：逻辑IO次数阈值，默认100次
+    * `log_slow_queries`：记录慢查询的SQL语句开关
+    * `log_queries_not_using_indexes`：记录未使用索引的SQL语句开关
+    * `log_throttle_not_using_indexes`：每分钟允许记录到slow log的且未使用索引的SQL语句次数，默认值0，表示无限制
+    * `log_output`：指定慢查询输出的格式，默认为`FILE`，可以将它设为`TABLE`，然后就可以查询`mysql`架构下的`slow_log`表了
+
+---
+
+##### 2.3 查询日志（log）
+
+* 记录了所有对MySQL数据库请求的信息，无论这些请求是否得到了正确的执行，默认名是：`主机名.log`
+
+* 在`mysql`架构下，表名为`general_log`
+
+---
+
+##### 2.4 二进制日志（binlog）
+
+* 二进制日志记录了对MySQL数据库执行更改的所有操作，但是不包括`SELECT`和`SHOW`这类操作
+
+* 二进制日志的作用：
+  - `恢复`（recovery）：某些数据的恢复需要二进制日志
+  - `复制`（replication）：其原理与恢复类似，通过复制和执行二进制日志使一台远程的MySQL数据库（称为`slave`）与一台MySQL数据库（称为`master`）进行实时同步
+  - `审计`（audit）：用户可以通过二进制日志中的信息来进行审计，判断是否有对数据库进行注入的攻击
+
+* 相关参数：
+  - `log-bin [=name]`
+    - 配置该参数可以启动二进制日志
+    - 若不指定`name`则默认`文件名为主机名，后缀名为二进制日志的序列号`
+    - 所在路径为数据库所在目录（`datadir`）
+  - `max_binlog_size`
+    - 单个二进制日志文件的最大值，默认1G
+    - 如果超过该值，则产生新的二进制日志文件，后缀名+1，并记录到.index文件
+  - `binlog_cache_size`
+    - 作用：
+      1. 当使用事务的表存储引擎时，所有`未提交`的二进制日志会被记录到一个`缓存`中去
+      2. 等该事务`提交`时直接将该`缓冲`中的二进制日志写入`二进制日志文件`
+      3. 该缓冲的大小由该参数决定，默认32K
+    - 大小设置：
+      1. 该参数是基于`会话`的，当一个线程开始一个事务时，MySQL会自动分配一个大小为`binlog_cache_size`的缓存，所以不能设置太大
+      2. 当一个事务的记录大于设定的`binlog_cache_size`时，MySQL会把缓冲中的日志写入一个`临时文件`中，所以不能设置太小
+    - 查看：
+      1. `binlog_cache_use`记录了使用缓冲写二进制日志的次数
+      2. `binlog_cache_disk_use`记录了使用临时文件写二进制日志的次数
+  - `sync_binlog`
+    - 作用：
+      1. 二进制文件并不是在每次写（缓冲写）的时候同步到磁盘
+      2. 该参数表示每写缓冲多少次就同步到磁盘。默认值0
+      3. sync_binlog=1表示采用同步写磁盘的方式来写二进制日志，这时写操作不使用操作系统的缓冲来写二进制文件
+    - `innodb_support_xa`参数可以确保`二进制日志`和`InnoDB存储引擎数据文件`的同步
+  - `binlog-do-db/binlog-ignore-db`
+    - 要写入和忽略哪些库的日志，默认为空，表示需要同步所有库的日志到二进制日志
+  - `log-slave-update`
+    - 如果当前数据库是slave角色，则它不会将从master取得并执行的二进制日志写入自己的二进制日志文件中
+    - 如果需要写入，则需要设置该参数
+  - `binlog_format`：影响记录二进制日志的格式
+    - `STATEMENT`：记录的是日志的逻辑SQL语句，可能出现主从不一致的情况
+    - `ROW`：记录表的行更改情况，会对磁盘空间要求有一定的增加
+    - `MIXED`：默认采用STATEMENT格式，在一些情况下会使用ROW格式
+
+* `mysqlbinlog`查看二进制日志文件
+
+    ```mysql
+    mysqlbinlog -vv --start-position=1065 test.000004
+    ```
+
+------
+
+#### 3. 套接字文件
+
+* 当用UNIX域套接字方式进行连接时需要的文件
+* 可以通过参数`socket`来定位文件
+
+```mysql
+SHOW VARIABLES LIKE 'socket'\G;
+```
+
+------
+
+#### 4. pid文件
+
+* 当MySQL实例启动时，会将自己的进程ID写入一个文件中
+* 可以通过参数`pid_file`来定位文件
+
+```mysql
+SHOW VARIABLES LIKE 'pid_file'\G;
+```
+
+------
+
+#### 5. 表结构定义文件
+
+* 用来存放MySQL表结构定义文件
+
+- MySQL数据的存储是根据表进行的，每个表都有与之对应的文件，但不论采用何种存储引擎，MySQL都有一个以`frm`为后缀名的文件，这个文件记录了该表的表结构定义。
+
+- frm用来存放视图的定义
+
+------
+
+#### 6. InnoDB存储引擎文件
+
+每个存储引擎都有自己的文件来保存各种数据，这些存储引擎真正存储了`记录`和`索引`等数据
+
+---
+
+##### 6.1 表空间文件
+
+- InnoDB采用将存储的数据按`表空间`(tablespace)进行存放的设计，默认配置下会有一个初始大小为10MB，名为`ibdata1`的文件
+
+- `innodb_data_file_path`
+
+  - 所有基于InnoDB存储引擎的表的数据都会记录到该共享表空间中。
+
+  ```mysql
+  innodb_data_file_path = /db/ibdata1:2000M;/dr2/db/ibdata2:2000M:autoextend
+  ```
+
+- `innodb_file_per_table`
+
+  - 用户可以将每个基于InnoDB存储引擎的表产生一个独立表空间。
+  - 命名规则为：`表名.ibd`
+  - 这些独立的表空间文件仅存储该表的`数据`、`索引`和`插入缓冲bitmap`等信息，其余信息还是存放在默认的表空间中
+
+------
+
+##### 6.2 重做日志文件
+
+- 默认情况下，在InnoDB存储引擎的数据目录下会有两个名为`ib_logfile0`和`ib_logfile1`的文件。它们记录了对于InnoDB存储引擎的事务日志
+  - 每个InnoDB存储引擎至少有1个`重做日志文件组`（group）
+  - 每个文件组下至少有2个`重做日志文件`
+  - 为了得到更高的可靠性，用户可以设置多个的`镜像日志组`（mirrored log groups）
+  - 日志组中放入每个重做日志文件的`大小一致`，并以`循环写入`的方式运行
+- 重要参数：
+  - `innodb_log_file_size`：指定每个重做日志文件的大小
+    - 大小设置：
+      - 不能太大，否则恢复时需要很长的时间
+      - 不能太小，否则可能导致一个事务的日志需要多次切换重做日志文件；频繁发生async checkpoint
+  - `innodb_log_file_in_group`：指定了日志文件组中重做日志文件的数量，默认为2
+  - `innodb_mirrored_log_groups`：指定了日志镜像文件组的数量，默认为1
+  - `innodb_log_group_home_dir`：指定了日志文件组所在路径，默认为./，表示数据目录下
+- 和binlog区别：
+  - 层次：
+    - 二进制日志会记录所有与MySQL数据库有关的日志记录，包括各种存储引擎的日志
+    - 而InnoDB存储引擎的重做日志只记录有关该存储引擎本身的事务日志。
+  - 记录的内容不同：
+    - 二进制日志文件记录的是关于一个事务的具体操作的内容，即该日志的`逻辑日志`
+    - 而InnoDB存储引擎的重做日志文件记录的是关于每个页（Page）的更改的`物理`情况
+  - 写入时间不同
+    - 二进制日志文件仅在`事务提交前进行提交`，即只写磁盘一次，不论这时该事务多大
+    - 而在事务进行的过程中，却不断有`重做日志条目`(redo entry)被写入到重做日志文件中。
+- `重做日志条目`(redo entry)结构：
+  - `redo_log_type`（1字节）：重做日志的类型，51种类型
+  - `space`（4字节）：表空间ID
+  - `page_no`（4字节）：页的偏移量
+  - `redo_log_body`：每个重做日志的数据部分，恢复时需要调用相应的函数进行解析
+- 从`重做日志缓冲`写入磁盘上的`重做日志文件`条件：
+  - `主线程`每秒刷新，不论事务是否已经提交
+  - 参数`innodb_flush_log_at_trx_commit`控制，表示在提交操作时，处理重做日志的方式：
+    - 0：提交事务时，并不将事务的重做日志写入磁盘上的日志文件，而是等到主线程每秒的刷新
+    - 1：表示执行commit时将重做日志缓冲同步写到磁盘，即伴有`fsync`调用
+    - 2：表示将重做日志异步写到磁盘，即写到`文件系统缓存`中，因此不能完全保证在执行commit时肯定会写入重做日志文件，只是有这个动作发生。
